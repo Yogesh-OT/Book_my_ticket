@@ -1,0 +1,5 @@
+M1,Inception,Sci-Fi,148,English,200.0,10:00 AM;02:30 PM;06:45 PM
+M2,Interstellar,Sci-Fi,169,English,250.0,11:15 AM;03:45 PM;08:00 PM
+M3,The Dark Knight,Action,152,English,220.0,09:30 AM;01:15 PM;07:00 PM
+M4,Avatar: Way of Water,Sci-Fi,192,English,240.0,10:30 AM;04:00 PM;08:30 PM
+M5,Dangal,Drama,161,Hindi,180.0,12:00 PM;05:00 PM;09:00 PM

@@ -1,0 +1,230 @@
+# Class Diagram: Book My Ticket
+
+The following Mermaid class diagram details the Object-Oriented design of the Book My Ticket system, including class attributes, methods, inheritance (`<|--`), interface realization (`<|..`), and associations (`-->`).
+
+```mermaid
+classDiagram
+    direction TB
+
+    %% Model Interfaces & Abstract Classes
+    class Bookable {
+        <<interface>>
+        +book() void
+        +cancel() void
+        +isBooked() boolean
+    }
+
+    class Person {
+        <<abstract>>
+        -String name
+        -String phoneNumber
+        +Person(String name, String phoneNumber)
+        +getName() String
+        +setName(String name) void
+        +getPhoneNumber() String
+        +setPhoneNumber(String phoneNumber) void
+        +getRole()* String
+        +toString() String
+    }
+
+    class Customer {
+        +Customer(String name, String phoneNumber)
+        +getRole() String
+    }
+
+    class Admin {
+        +String DEFAULT_ADMIN_PASSWORD$
+        +Admin(String name)
+        +getRole() String
+        +authenticate(String password)$ boolean
+    }
+
+    class Seat {
+        <<abstract>>
+        -String seatNumber
+        -double basePrice
+        -boolean booked
+        +Seat(String seatNumber, double basePrice)
+        +getSeatNumber() String
+        +setSeatNumber(String seatNumber) void
+        +getBasePrice() double
+        +setBasePrice(double basePrice) void
+        +isBooked() boolean
+        +setBooked(boolean booked) void
+        +book() void
+        +cancel() void
+        +getPrice()* double
+        +getSeatType()* String
+        +toString() String
+    }
+
+    class RegularSeat {
+        +RegularSeat(String seatNumber, double basePrice)
+        +getPrice() double
+        +getSeatType() String
+    }
+
+    class PremiumSeat {
+        -double PREMIUM_SURCHARGE$
+        +PremiumSeat(String seatNumber, double basePrice)
+        +getPrice() double
+        +getSeatType() String
+        +getSurcharge()$ double
+    }
+
+    class Show {
+        -String showId
+        -String time
+        -List~Seat~ seats
+        +Show(String showId, String time, double basePrice)
+        -initializeSeats(double basePrice) void
+        +getShowId() String
+        +setShowId(String showId) void
+        +getTime() String
+        +setTime(String time) void
+        +getSeats() List~Seat~
+        +getSeat(String seatNumber) Seat
+        +getAvailableSeatCount() int
+        +getTotalSeatCount() int
+        +toString() String
+    }
+
+    class Movie {
+        -String movieId
+        -String title
+        -String genre
+        -int durationMinutes
+        -String language
+        -double basePrice
+        -List~Show~ shows
+        +Movie(String movieId, String title, String genre, int durationMinutes, String language, double basePrice)
+        +getMovieId() String
+        +setMovieId(String movieId) void
+        +getTitle() String
+        +setTitle(String title) void
+        +getGenre() String
+        +setGenre(String genre) void
+        +getDurationMinutes() int
+        +setDurationMinutes(int durationMinutes) void
+        +getLanguage() String
+        +setLanguage(String language) void
+        +getBasePrice() double
+        +setBasePrice(double basePrice) void
+        +getShows() List~Show~
+        +setShows(List~Show~ shows) void
+        +addShow(Show show) void
+        +getShowByTime(String time) Show
+        +getShowById(String showId) Show
+        +toString() String
+    }
+
+    class Booking {
+        -String bookingId
+        -Customer customer
+        -String movieId
+        -String movieTitle
+        -String showTime
+        -List~String~ seatNumbers
+        -double totalAmount
+        -String status
+        -String bookingDate
+        +Booking(String bookingId, Customer customer, String movieId, String movieTitle, String showTime, List~String~ seatNumbers, double totalAmount, String status, String bookingDate)
+        +getBookingId() String
+        +setBookingId(String bookingId) void
+        +getCustomer() Customer
+        +setCustomer(Customer customer) void
+        +getMovieId() String
+        +setMovieId(String movieId) void
+        +getMovieTitle() String
+        +setMovieTitle(String movieTitle) void
+        +getShowTime() String
+        +setShowTime(String showTime) void
+        +getSeatNumbers() List~String~
+        +setSeatNumbers(List~String~ seatNumbers) void
+        +getTotalAmount() double
+        +setTotalAmount(double totalAmount) void
+        +getStatus() String
+        +setStatus(String status) void
+        +getBookingDate() String
+        +setBookingDate(String bookingDate) void
+        +book() void
+        +cancel() void
+        +isBooked() boolean
+        +getSeatsCommaSeparated() String
+        +toString() String
+    }
+
+    %% Service Classes
+    class MovieService {
+        -List~Movie~ movies
+        +MovieService()
+        +getAllMovies() List~Movie~
+        +getMovieById(String movieId) Movie
+        +getMovieByTitle(String title) Movie
+        +addMovie(Movie movie) void
+        +removeMovie(String movieId) boolean
+        +generateNextMovieId() String
+        +reloadMovies() void
+        +saveAll() void
+    }
+
+    class BookingService {
+        -Map~String,Booking~ bookings
+        -int nextBookingSequence
+        +BookingService(MovieService movieService)
+        -initSequence() void
+        +syncBookedSeatsWithMovies(List~Movie~ movies) void
+        +calculateTotal(List~Seat~ seats) double
+        +calculateTotal(List~Seat~ seats, double discountPercentage) double
+        +calculateTotal(int seatCount, double unitPrice) double
+        +bookSeats(Customer customer, Movie movie, Show show, List~Seat~ selectedSeats) Booking
+        +cancelBooking(String bookingId, MovieService movieService) boolean
+        +saveBookingsAsync() void
+        +saveAllSync() void
+        +getBooking(String bookingId) Booking
+        +getAllBookings() List~Booking~
+        +getBookingsByCustomer(String phoneNumber) List~Booking~
+    }
+
+    %% Util and Exceptions
+    class FileManager {
+        -String DATA_DIR$
+        -String MOVIES_FILE$
+        -String BOOKINGS_FILE$
+        +initializeFiles()$ void
+        +seedDefaultMovies()$ void
+        +loadMovies()$ List~Movie~
+        +saveMovies(List~Movie~ movies)$ void
+        +loadBookings()$ Map~String,Booking~
+        +saveBookings(Collection~Booking~ bookings)$ void
+    }
+
+    class SeatAlreadyBookedException {
+        +SeatAlreadyBookedException(String message)
+        +SeatAlreadyBookedException(String seatNumber, String showTime)
+    }
+
+    class InvalidInputException {
+        +InvalidInputException(String message)
+    }
+
+    %% Inheritance Relationships
+    Person <|-- Customer
+    Person <|-- Admin
+    Bookable <|.. Seat
+    Seat <|-- RegularSeat
+    Seat <|-- PremiumSeat
+    Bookable <|.. Booking
+
+    %% Composition / Associations
+    Movie "1" *-- "many" Show : contains
+    Show "1" *-- "40" Seat : contains
+    Booking "many" --> "1" Customer : booked by
+    BookingService --> MovieService : coordinates
+    BookingService o-- Booking : manages
+    MovieService o-- Movie : manages
+    BookingService ..> FileManager : uses
+    MovieService ..> FileManager : uses
+    BookingService ..> SeatAlreadyBookedException : throws
+    BookingService ..> InvalidInputException : throws
+```
